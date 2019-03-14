@@ -1,3 +1,5 @@
+# Old readme (outdated as of 3/14/2019)
+
 # Leaflet WMS Legend Plugin
 
 This is a simple plugin for [leaflet](http://leafletjs.com/) that will display a 
