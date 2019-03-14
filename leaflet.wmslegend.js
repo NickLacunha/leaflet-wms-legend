@@ -3,27 +3,30 @@
  */
 
 L.Control.WMSLegend = L.Control.extend({
-    options: {
-        position: 'topright',
-        uri: ''
-    },
-
     onAdd: function () {
-        var controlClassName = 'leaflet-control-wms-legend',
-            legendClassName = 'wms-legend',
+        var controlClassName = "leaflet-control-wms-legend",
+            legendClassName = "wms-legend",
             stop = L.DomEvent.stopPropagation;
-        this.container = L.DomUtil.create('div', controlClassName);
-        this.img = L.DomUtil.create('img', legendClassName, this.container);
+        this.container = L.DomUtil.create("div", controlClassName);
+        if (options.title) {
+            this.title = L.DomUtil.create("label", "leaflet-wms-legend-title", this.container);
+            this.title.innerHTML = this.options.title;
+        }
+        this.br = L.DomUtil.create("br", "", this.container);
+        this.img = L.DomUtil.create("img", legendClassName, this.container);
+        this.toggle = L.DomUtil.create("span", "glyphicon glyphicon-menu-hamburger", this.container);
+        this.toggle.style.display = "none";
+        this.toggle.style.textalign = "center"
         this.img.src = this.options.uri;
-        this.img.alt = 'Legend';
+        this.img.alt = "Legend";
 
         L.DomEvent
-            .on(this.img, 'click', this._click, this)
-            .on(this.container, 'click', this._click, this)
-            .on(this.img, 'mousedown', stop)
-            .on(this.img, 'dblclick', stop)
-            .on(this.img, 'click', L.DomEvent.preventDefault)
-            .on(this.img, 'click', stop);
+            .on(this.img, "click", this._click, this)
+            .on(this.container, "click", this._click, this)
+            .on(this.img, "mousedown", stop)
+            .on(this.img, "dblclick", stop)
+            .on(this.img, "click", L.DomEvent.preventDefault)
+            .on(this.img, "click", stop);
         this.height = null;
         this.width = null;
         return this.container;
@@ -33,10 +36,15 @@ L.Control.WMSLegend = L.Control.extend({
         L.DomEvent.preventDefault(e);
         // toggle legend visibility
         var style = window.getComputedStyle(this.img);
-        if (style.display === 'none') {
-            this.container.style.height = this.height + 'px';
-            this.container.style.width = this.width + 'px';
+        if (style.display === "none") {
+            this.container.style.height = this.height + "px";
+            this.container.style.width = this.width + "px";
             this.img.style.display = this.displayStyle;
+            this.toggle.style.display = "none";
+            if (options.title) {
+                this.title.style.display = this.displayStyle;
+            }
+            this.br.style.display = this.displayStyle;
         }
         else {
             if (this.width === null && this.height === null) {
@@ -46,15 +54,29 @@ L.Control.WMSLegend = L.Control.extend({
                 this.width = this.container.offsetWidth;
             }
             this.displayStyle = this.img.style.display;
-            this.img.style.display = 'none';
-            this.container.style.height = '20px';
-            this.container.style.width = '20px';
+            this.img.style.display = "none";
+            this.toggle.style.display = this.displayStyle;
+            if (options.title) {
+                this.title.style.display = "none";
+            }
+            this.br.style.display = "none";
+            this.container.style.height = "20px";
+            this.container.style.width = "20px";
         }
     },
 });
 
-L.wmsLegend = function (uri) {
-    var wmsLegendControl = new L.Control.WMSLegend;
+L.wmsLegend = function (title, serviceUrl, legendOptions, map) {
+    var queryString = L.Util.getParamString(legendOptions);
+    var uri = serviceUrl + queryString;
+
+    var options = {
+        position: "topright",
+        uri: uri,
+        title: title
+    };
+
+    var wmsLegendControl = new L.Control.WMSLegend(options);
     wmsLegendControl.options.uri = uri;
     map.addControl(wmsLegendControl);
     return wmsLegendControl;

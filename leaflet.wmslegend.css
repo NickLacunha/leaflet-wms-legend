@@ -11,7 +11,7 @@
     background-color: #FFFFFF;
 }
 
-.leaflet-control-wms-legend:hover
-{
-    background-color: #F4F4F4;
+.leaflet-wms-legend-title {
+    width: 100%;
+    text-align: left;
 }
